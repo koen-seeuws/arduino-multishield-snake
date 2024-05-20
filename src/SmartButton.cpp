@@ -5,7 +5,7 @@
 #include "SmartButton.h"
 #include "Arduino.h"
 
-SmartButton::SmartButton(const int buttonPin) : pin(buttonPin),
+SmartButton::SmartButton(const unsigned int buttonPin) : pin(buttonPin),
                                                 //Press variables
                                                 pressLastDebouceTime(0),
                                                 pressLastButtonState(LOW),

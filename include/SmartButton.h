@@ -7,7 +7,7 @@
 
 class SmartButton {
 private:
-    int pin;
+    unsigned int pin;
 
     const unsigned long debounceDelay = 50; // 50 milliseconds debounce delay
 
@@ -24,10 +24,12 @@ private:
     bool buttonHeldDown;
 
 public:
-    explicit SmartButton(int buttonPin);
+    explicit SmartButton(unsigned int buttonPin);
 
     bool isPressed();
+
     bool isReleased();
+
     bool isHeldDown();
 };
 
