@@ -11,16 +11,18 @@
 class Snake {
 private:
     Direction direction;
-    Coordinate** coordinates;
+    int length;
+    mutable Coordinate **coordinates;
 
 public:
     explicit Snake();
+    ~Snake();
 
     void turnLeft();
 
     void turnRight();
 
-    void move();
+    void move() const;
 
     Direction getDirection();
 

@@ -6,10 +6,10 @@
 #define DIRECTION_H
 
 enum Direction {
-    UP = 0,
-    RIGHT = 1,
-    DOWN = 2,
-    LEFT = 3,
+    RIGHT = 0,
+    DOWN = 1,
+    LEFT = 2,
+    UP = 3,
 };
 
 #endif //DIRECTION_H
