@@ -26,10 +26,16 @@ private:
     bool buttonHeldDown;
 
 public:
-    explicit SmartButton(const int buttonPin) : pin(buttonPin), pressLastDebouceTime(0), pressLastButtonState(LOW),
+    explicit SmartButton(const int buttonPin) : pin(buttonPin),
+                                                //Press variables
+                                                pressLastDebouceTime(0),
+                                                pressLastButtonState(LOW),
                                                 buttonPressHandled(false),
-                                                releaseLastDebounceTime(0), releaseLastButtonState(HIGH),
-                                                buttonReleaseHandled(false),
+                                                //Release variables
+                                                releaseLastDebounceTime(0),
+                                                releaseLastButtonState(HIGH),
+                                                buttonReleaseHandled(true), //Initialized to true (because of startup)
+                                                //Hold variables
                                                 buttonDownTime(0), buttonHeldDown(false) {
         pinMode(pin, INPUT_PULLUP);
     }
@@ -38,17 +44,19 @@ public:
         const unsigned long currentTime = millis();
         const bool buttonState = digitalRead(pin);
 
-        if (buttonState != pressLastButtonState)
+        if (buttonState != pressLastButtonState) {
             pressLastDebouceTime = currentTime;
+            buttonPressHandled = false; // Reset the button handled flag when state changes
+        }
 
-        if (currentTime - pressLastDebouceTime > debounceDelay) {
-            if (buttonState == LOW && !buttonPressHandled) {
-                buttonPressHandled = true;
-                pressLastButtonState = buttonState;
-                return true;
-            }
-        } else {
-            buttonPressHandled = false;
+        if (currentTime - pressLastDebouceTime <= debounceDelay) {
+            return false;
+        }
+
+        if (buttonState == LOW && !buttonPressHandled) {
+            buttonPressHandled = true;
+            pressLastButtonState = buttonState;
+            return true;
         }
 
         return false;
@@ -58,31 +66,35 @@ public:
         const unsigned long currentTime = millis();
         const bool buttonState = digitalRead(pin);
 
-        if (buttonState != releaseLastButtonState)
+        if (buttonState != releaseLastButtonState) {
             releaseLastDebounceTime = currentTime;
-
-        if (currentTime - releaseLastDebounceTime > debounceDelay) {
-            if (buttonState == HIGH && !buttonReleaseHandled) {
-                buttonReleaseHandled = true;
-                releaseLastButtonState = buttonState;
-                return true;
-            }
-        } else {
-            buttonReleaseHandled = false;
+            buttonReleaseHandled = false; // Reset the button handled flag when state changes
         }
+
+        if (currentTime - releaseLastDebounceTime <= debounceDelay) {
+            return false;
+        }
+
+        if (buttonState == HIGH && !buttonReleaseHandled) {
+            buttonReleaseHandled = true;
+            releaseLastButtonState = buttonState;
+            return true;
+        }
+
 
         return false;
     }
 
     bool isHeldDown() {
+        const unsigned long currentTime = millis();
         const bool buttonState = digitalRead(pin);
 
         if (buttonState == LOW) {
             if (!buttonHeldDown) {
-                buttonDownTime = millis();
+                buttonDownTime = currentTime;
                 buttonHeldDown = true;
             }
-            if (millis() - buttonDownTime > holdDelay) {
+            if (currentTime - buttonDownTime > holdDelay) {
                 return true;
             }
         } else {
