@@ -2,21 +2,15 @@
 #include <MultiShield.h>
 #include <SmartButton.h>
 #include <SnakeSetup.h>
-#include <Direction.h>
-
-Direction currentDirection = RIGHT;
+#include <Snake.h>
 
 void display(byte displayPosition, uint8_t value);
-
-void turnLeft();
-
-void turnRight();
 
 auto leftButton = SmartButton(BUTTON_1_PIN);
 auto middleButton = SmartButton(BUTTON_2_PIN);
 auto rightButton = SmartButton(BUTTON_3_PIN);
 
-static bool field[8][2];
+auto snake = Snake();
 
 void setup() {
     // write your initialization code here
@@ -27,8 +21,6 @@ void setup() {
     setupLeds();
     setupBuzzer();
     setupDisplay();
-
-    field[0][0] = true;
 }
 
 static constexpr unsigned long REFRESH_INTERVAL = 1000; // ms
@@ -42,18 +34,19 @@ void loop() {
     if (currentTime - lastRefreshTime >= REFRESH_INTERVAL) {
         lastRefreshTime += REFRESH_INTERVAL;
         Serial.println(lastRefreshTime);
+        snake.move();
     }
 
     if (leftButton.isPressed()) {
-        turnLeft();
+        snake.turnLeft();
     }
 
-    if (rightButton.isReleased()) {
-        turnRight();
+    if (rightButton.isPressed()) {
+        snake.turnRight();
     }
 
-    for (int i = 0; i < 4; i++) {
-        display(i, DISPLAY_NUMERIC[currentDirection]);
+    for (int i = 0; i < 3; i++) {
+        display(i, DISPLAY_NUMERIC[snake.getDirection()]);
     }
 }
 
@@ -62,18 +55,4 @@ void display(const byte displayPosition, const uint8_t value) {
     shiftOut(DATA_PIN, CLK_PIN,MSBFIRST, value); //Send value to the 4 displays
     shiftOut(DATA_PIN, CLK_PIN,MSBFIRST, DISPLAY_POSITIONS[displayPosition]); //Send which display
     digitalWrite(LATCH_PIN,HIGH);
-}
-
-void turnLeft() {
-    short value = currentDirection - 1;
-    if (value < UP)
-        value = LEFT;
-    currentDirection = static_cast<Direction>(value);
-}
-
-void turnRight() {
-    short value = currentDirection + 1;
-    if (value > LEFT)
-        value = UP;
-    currentDirection = static_cast<Direction>(value);
 }
