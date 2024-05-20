@@ -6,7 +6,8 @@
 #include <Coordinate.h>
 
 Snake::Snake() : direction(RIGHT){
-    //coordinates = {new Coordinate(0,0), new Coordinate(1, 0)};
+    coordinates[0] = new Coordinate(0,0);
+    coordinates[1] = new Coordinate(1,0);
 }
 
 void Snake::turnLeft(){
@@ -26,14 +27,13 @@ void Snake::turnRight(){
 void Snake::move() {
     auto snakeLength = sizeof(&coordinates) - 1;
 
-
-
+    //TODO: implement moving logic
 }
 
 Direction Snake::getDirection(){
     return direction;
 }
 
-Coordinate* Snake::getCoordinates(){
+Coordinate **Snake::getCoordinates(){
     return coordinates;
 }

@@ -45,7 +45,7 @@ void loop() {
         snake.turnRight();
     }
 
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < 4; i++) {
         display(i, DISPLAY_NUMERIC[snake.getDirection()]);
     }
 }

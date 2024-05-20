@@ -11,7 +11,7 @@
 class Snake {
 private:
     Direction direction;
-    Coordinate* coordinates[];
+    Coordinate** coordinates;
 
 public:
     explicit Snake();
@@ -24,7 +24,7 @@ public:
 
     Direction getDirection();
 
-    Coordinate getCoordinates();
+    Coordinate **getCoordinates();
 };
 
 #endif //SNAKE_H

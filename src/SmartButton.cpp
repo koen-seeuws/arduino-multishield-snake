@@ -61,7 +61,6 @@ bool SmartButton::isReleased() {
         return true;
     }
 
-
     return false;
 }
 
