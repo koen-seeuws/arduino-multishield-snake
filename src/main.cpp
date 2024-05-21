@@ -49,23 +49,29 @@ void loop() {
         snake->turnRight();
     }
 
-    uint8_t displayValues[] = {0xFF, 0xFF, 0xFF, 0xFF};
+    if (!snake->getIsDead()) {
+        uint8_t displayValues[] = {0xFF, 0xFF, 0xFF, 0xFF};
 
+        /*
+        for (int i = 0; i < snake->getLength() - 1; i++) {
+            const auto pos1 = positions[i];
+            const auto pos2 = positions[i + 1];
 
-    /*
-    for (int i = 0; i < snake->getLength() - 1; i++) {
-        const auto pos1 = positions[i];
-        const auto pos2 = positions[i + 1];
+            auto xDiff = pos1->getX() - pos2->getX();
+            auto yDiff = pos1->getY() - pos2->getY();
 
-        auto xDiff = pos1->getX() - pos2->getX();
-        auto yDiff = pos1->getY() - pos2->getY();
+            auto displayPosition = 1;
+        }
+        */
 
-        auto displayPosition = 1;
-    }
-*/
-
-    for (byte i = 0; i < 4; i++) {
-        display(0, displayValues[0]);
+        for (byte i = 0; i < 4; i++) {
+            display(i, displayValues[i]);
+        }
+    } else {
+        display(0, DISPLAY_ALPHABET[3]);
+        display(1, DISPLAY_ALPHABET[4]);
+        display(2, DISPLAY_ALPHABET[0]);
+        display(3, DISPLAY_ALPHABET[3]);
     }
 }
 

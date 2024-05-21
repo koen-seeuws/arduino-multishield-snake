@@ -90,3 +90,8 @@ int Snake::getLength() const {
 Position **Snake::getPostions() const {
     return positions;
 }
+
+bool Snake::getIsDead() const {
+    return isDead;
+}
+
