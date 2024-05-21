@@ -2,20 +2,19 @@
 // Created by Koen Seeuws on 20/05/2024.
 //
 
-#include "Snake.h"
-#include <Coordinate.h>
+#include <Snake.h>
+#include <Position.h>
 
-Snake::Snake() : direction(RIGHT), length(2), coordinates(new Coordinate*[length])  {
+Snake::Snake(Field *field) : direction(RIGHT), length(2), field(field), positions(new Position *[length]) {
     for (int x = 0; x < length; x++) {
-        coordinates[x] = new Coordinate(x, 0);
+        const auto position = field->getPosition(x, 0);
+        positions[x] = position;
+        position->setSnake(this);
     }
 }
 
 Snake::~Snake() {
-    for (const Coordinate* coordinate: coordinates) {
-        delete coordinate;
-    }
-    delete[] coordinates;
+    delete[] positions;
 }
 
 void Snake::turnLeft() {
@@ -32,41 +31,62 @@ void Snake::turnRight() {
     direction = static_cast<Direction>(value);
 }
 
-void Snake::move() const {
-    //TODO: TEST!
-    const auto newCoordinates = new Coordinate*[length];
+bool Snake::move() const {
+    auto newPositions = new Position *[length];
 
-    for (unsigned int snakeSegment = 0; snakeSegment < length - 1; snakeSegment++) {
-        newCoordinates[0] = coordinates[snakeSegment + 1];
+    // Shift the snake's body positions
+    for (int snakeSegment = 0; snakeSegment < length - 1; ++snakeSegment) {
+        newPositions[snakeSegment] = positions[snakeSegment + 1];
     }
 
-    const auto oldTail = coordinates[0];
-    delete oldTail;
+    // Get the head position
+    auto oldHead = positions[length - 1];
+    int x = oldHead->getX(), y = oldHead->getY();
 
-    Coordinate *newHead;
-    const auto oldHead = coordinates[length - 1];
+    // Determine the new head position based on the current direction
     switch (direction) {
-        case RIGHT: newHead = new Coordinate(oldHead->getX() + 1, oldHead->getY());
+        case RIGHT: x += 1;
             break;
-        case DOWN: newHead = new Coordinate(oldHead->getX(), oldHead->getY() - 1);
+        case DOWN: y -= 1;
             break;
-        case LEFT: newHead = new Coordinate(oldHead->getX() - 1, oldHead->getY());
+        case LEFT: x -= 1;
             break;
-        case UP: newHead = new Coordinate(oldHead->getX(), oldHead->getY() + 1);
+        case UP: y += 1;
             break;
-        default: newHead = new Coordinate(oldHead->getX(), oldHead->getY());
     }
 
-    newCoordinates[length - 1] = newHead;
+    // Check for collision with the barrier
+    if (x < 0 || x >= field->getWidth() || y < 0 || y >= field->getHeight()) {
+        return false;
+    }
 
-    delete[] coordinates;
-    coordinates = newCoordinates;
+    // Get the new head position from the field
+    const auto newHead = field->getPosition(x, y);
+
+    // Check for collision with itself
+    if (newHead->getSnake() != nullptr) {
+        return false;
+    }
+
+    // Update the snake pointers in the field positions
+    positions[0]->setSnake(nullptr);  // Remove snake from old tail
+    newHead->setSnake(const_cast<Snake *>(this)); // Set snake to new head
+    newPositions[length - 1] = newHead;
+
+    delete[] positions;
+    positions = newPositions;
+
+    return true;
 }
 
-Direction Snake::getDirection() {
+Direction Snake::getDirection() const {
     return direction;
 }
 
-Coordinate **Snake::getCoordinates() {
-    return coordinates;
+int Snake::getLength() const {
+    return length;
+}
+
+Position **Snake::getPostions() const {
+    return positions;
 }

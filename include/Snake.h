@@ -6,27 +6,32 @@
 #define SNAKE_H
 
 #include <Direction.h>
-#include <Coordinate.h>
+#include <Field.h>
+#include <Position.h>
 
 class Snake {
 private:
     Direction direction;
     int length;
-    mutable Coordinate **coordinates;
+    Field *field;
+    mutable Position **positions;
 
 public:
-    explicit Snake();
+    explicit Snake(Field *field);
+
     ~Snake();
 
     void turnLeft();
 
     void turnRight();
 
-    void move() const;
+    bool move() const;
 
-    Direction getDirection();
+    Direction getDirection() const;
 
-    Coordinate **getCoordinates();
+    int getLength() const;
+
+    Position **getPostions() const;
 };
 
 #endif //SNAKE_H
