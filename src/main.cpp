@@ -5,18 +5,20 @@
 #include <Snake.h>
 
 void display(byte displayPosition, uint8_t value);
+void printSnakeToSerial();
 
 auto leftButton = SmartButton(BUTTON_1_PIN);
 auto middleButton = SmartButton(BUTTON_2_PIN);
 auto rightButton = SmartButton(BUTTON_3_PIN);
 
-auto snake = Snake();
+auto field = new Field(8, 3);
+auto snake = new Snake(field);
+auto snakeIsAlive = true;
+Position **positions;
 
 void setup() {
     // write your initialization code here
     Serial.begin(9600);
-
-    pinMode(BUTTON_1_PIN, INPUT_PULLUP);
 
     setupLeds();
     setupBuzzer();
@@ -34,19 +36,40 @@ void loop() {
     if (currentTime - lastRefreshTime >= REFRESH_INTERVAL) {
         lastRefreshTime += REFRESH_INTERVAL;
         Serial.println(lastRefreshTime);
-        snake.move();
+
+        if (snakeIsAlive) {
+            snakeIsAlive = snake->move();
+            positions = snake->getPostions();
+        }
+
+        printSnakeToSerial();
     }
 
     if (leftButton.isPressed()) {
-        snake.turnLeft();
+        snake->turnLeft();
     }
 
     if (rightButton.isPressed()) {
-        snake.turnRight();
+        snake->turnRight();
     }
 
-    for (int i = 0; i < 4; i++) {
-        display(i, DISPLAY_NUMERIC[snake.getDirection()]);
+    uint8_t displayValues[] = {0xFF, 0xFF, 0xFF, 0xFF};
+
+
+    /*
+    for (int i = 0; i < snake->getLength() - 1; i++) {
+        const auto pos1 = positions[i];
+        const auto pos2 = positions[i + 1];
+
+        auto xDiff = pos1->getX() - pos2->getX();
+        auto yDiff = pos1->getY() - pos2->getY();
+
+        auto displayPosition = 1;
+    }
+*/
+
+    for (byte i = 0; i < 4; i++) {
+        display(0, displayValues[0]);
     }
 }
 
@@ -55,4 +78,18 @@ void display(const byte displayPosition, const uint8_t value) {
     shiftOut(DATA_PIN, CLK_PIN,MSBFIRST, value); //Send value to the 4 displays
     shiftOut(DATA_PIN, CLK_PIN,MSBFIRST, DISPLAY_POSITIONS[displayPosition]); //Send which display
     digitalWrite(LATCH_PIN,HIGH);
+}
+
+void printSnakeToSerial() {
+    for (int y = field->getHeight() - 1; y >= 0; y--) {
+        for (int x = 0; x < field->getWidth(); x++) {
+            auto pos = field->getPosition(x, y);
+            if(pos->getSnake() != nullptr) {
+                Serial.print("S");
+            } else {
+                Serial.print("*");
+            }
+        }
+        Serial.println();
+    }
 }
