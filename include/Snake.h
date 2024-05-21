@@ -15,9 +15,9 @@ private:
     int length;
     Field *field;
     mutable Position **positions;
-
+    mutable bool isDead;
 public:
-    explicit Snake(Field *field);
+    explicit Snake(int length, Field *field);
 
     ~Snake();
 
@@ -25,13 +25,15 @@ public:
 
     void turnRight();
 
-    bool move() const;
+    void move() const;
 
     Direction getDirection() const;
 
     int getLength() const;
 
     Position **getPostions() const;
+
+    bool getIsDead() const;
 };
 
 #endif //SNAKE_H

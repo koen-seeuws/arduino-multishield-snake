@@ -5,6 +5,7 @@
 #include <Snake.h>
 
 void display(byte displayPosition, uint8_t value);
+
 void printSnakeToSerial();
 
 auto leftButton = SmartButton(BUTTON_1_PIN);
@@ -12,9 +13,7 @@ auto middleButton = SmartButton(BUTTON_2_PIN);
 auto rightButton = SmartButton(BUTTON_3_PIN);
 
 auto field = new Field(8, 3);
-auto snake = new Snake(field);
-auto snakeIsAlive = true;
-Position **positions;
+auto snake = new Snake(4, field);
 
 void setup() {
     // write your initialization code here
@@ -37,10 +36,7 @@ void loop() {
         lastRefreshTime += REFRESH_INTERVAL;
         Serial.println(lastRefreshTime);
 
-        if (snakeIsAlive) {
-            snakeIsAlive = snake->move();
-            positions = snake->getPostions();
-        }
+        snake->move();
 
         printSnakeToSerial();
     }
@@ -83,8 +79,8 @@ void display(const byte displayPosition, const uint8_t value) {
 void printSnakeToSerial() {
     for (int y = field->getHeight() - 1; y >= 0; y--) {
         for (int x = 0; x < field->getWidth(); x++) {
-            auto pos = field->getPosition(x, y);
-            if(pos->getSnake() != nullptr) {
+            auto position = field->getPosition(x, y);
+            if (position->getSnake() != nullptr) {
                 Serial.print("S");
             } else {
                 Serial.print("*");

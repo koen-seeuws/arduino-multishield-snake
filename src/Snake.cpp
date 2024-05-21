@@ -5,7 +5,7 @@
 #include <Snake.h>
 #include <Position.h>
 
-Snake::Snake(Field *field) : direction(RIGHT), length(2), field(field), positions(new Position *[length]) {
+Snake::Snake(const int length, Field *field) : direction(RIGHT), length(length), field(field), positions(new Position *[length]), isDead(false) {
     for (int x = 0; x < length; x++) {
         const auto position = field->getPosition(x, 0);
         positions[x] = position;
@@ -31,7 +31,9 @@ void Snake::turnRight() {
     direction = static_cast<Direction>(value);
 }
 
-bool Snake::move() const {
+void Snake::move() const {
+    if(isDead) return;
+
     auto newPositions = new Position *[length];
 
     // Shift the snake's body positions
@@ -57,7 +59,7 @@ bool Snake::move() const {
 
     // Check for collision with the barrier
     if (x < 0 || x >= field->getWidth() || y < 0 || y >= field->getHeight()) {
-        return false;
+        isDead = true;
     }
 
     // Get the new head position from the field
@@ -65,7 +67,7 @@ bool Snake::move() const {
 
     // Check for collision with itself
     if (newHead->getSnake() != nullptr) {
-        return false;
+        isDead = true;
     }
 
     // Update the snake pointers in the field positions
@@ -75,8 +77,6 @@ bool Snake::move() const {
 
     delete[] positions;
     positions = newPositions;
-
-    return true;
 }
 
 Direction Snake::getDirection() const {
